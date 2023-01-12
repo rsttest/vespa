@@ -76,7 +76,7 @@ void Test::requireThatAllTermsCanBeVisited() {
     EXPECT_TRUE(!checkVisit(new SimpleEquiv(17, Weight(100))));
     EXPECT_TRUE(!checkVisit(new SimpleNear(2)));
     EXPECT_TRUE(!checkVisit(new SimpleONear(2)));
-    EXPECT_TRUE(!checkVisit(new SimpleSameElement("foo")));
+    EXPECT_TRUE(!checkVisit(new SimpleSameElement("foo", 0, Weight(0))));
     EXPECT_TRUE(!checkVisit(new SimpleOr));
     EXPECT_TRUE(!checkVisit(new SimpleRank));
 }
@@ -84,4 +84,3 @@ void Test::requireThatAllTermsCanBeVisited() {
 }  // namespace
 
 TEST_APPHOOK(Test);
-#include <vespa/vespalib/testkit/testapp.h>

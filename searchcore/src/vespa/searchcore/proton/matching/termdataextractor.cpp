@@ -39,7 +39,10 @@ public:
         _term_data.push_back(&n);
     }
 
-    virtual void visit(ProtonNodeTypes::SameElement &) override {}
+    virtual void visit(ProtonNodeTypes::SameElement &n) override {
+        _term_data.push_back(&n);
+    }
+
 };
 }  // namespace
 
