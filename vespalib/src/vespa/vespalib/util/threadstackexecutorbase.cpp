@@ -325,4 +325,12 @@ ThreadStackExecutorBase::~ThreadStackExecutorBase()
     assert(_blocked.empty());
 }
 
+#if defined(__APPLE__) && !defined(__clang__)
+bool
+ThreadStackExecutorBase::owns_this_thread() const
+{
+    return (_master == this);
+}
+#endif
+
 } // namespace vespalib

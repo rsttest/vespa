@@ -167,7 +167,11 @@ protected:
     /**
      * Returns true if the current thread is owned by this executor.
      **/
+#if defined(__APPLE__) && !defined(__clang__)
+    bool owns_this_thread() const;
+#else
     bool owns_this_thread() const { return (_master == this); }
+#endif
 
     /**
      * Sets a new upper limit for accepted number of tasks.

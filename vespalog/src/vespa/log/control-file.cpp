@@ -261,8 +261,12 @@ ControlFile::getLevels(const char *name)
     unsigned int padding = static_cast<unsigned int>(-newLength) & 3u;
     strcat(appendedString, &padSpaces[3 - padding]);
     int prefix_len = strlen(appendedString);
-
+#pragma GCC diagnostic push
+#if defined(__APPLE__) && !defined(__clang__) && __GNUC__ == 12
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+#endif
     strncat(appendedString, inheritLevels, Logger::NUM_LOGLEVELS*sizeof(int));
+#pragma GCC diagnostic pop
     strcat(appendedString, "\n");
 
     int len = strlen(appendedString);
