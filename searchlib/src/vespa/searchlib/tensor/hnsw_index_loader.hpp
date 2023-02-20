@@ -3,6 +3,7 @@
 #pragma once
 
 #include "hnsw_index_loader.h"
+#include "doc_vector_access.h"
 #include "hnsw_graph.h"
 #include <vespa/searchlib/util/fileutil.h>
 #include <cassert>
@@ -22,7 +23,7 @@ template <typename ReaderType, HnswIndexType type>
 HnswIndexLoader<ReaderType, type>::~HnswIndexLoader() = default;
 
 template <typename ReaderType, HnswIndexType type>
-HnswIndexLoader<ReaderType, type>::HnswIndexLoader(HnswGraph<type>& graph, IdMapping& id_mapping, std::unique_ptr<ReaderType> reader)
+HnswIndexLoader<ReaderType, type>::HnswIndexLoader(HnswGraph<type>& graph, IdMapping& id_mapping, const DocVectorAccess& vectors, std::unique_ptr<ReaderType> reader)
     : _graph(graph),
       _reader(std::move(reader)),
       _entry_nodeid(0),
@@ -31,7 +32,8 @@ HnswIndexLoader<ReaderType, type>::HnswIndexLoader(HnswGraph<type>& graph, IdMap
       _nodeid(0),
       _link_array(),
       _complete(false),
-      _id_mapping(id_mapping)
+      _id_mapping(id_mapping),
+      _vectors(vectors)
 {
     init();
 }
@@ -48,6 +50,8 @@ HnswIndexLoader<ReaderType, type>::load_next()
             uint32_t docid = identity_mapping ? _nodeid : next_int();
             uint32_t subspace = identity_mapping  ? 0 : next_int();
             _graph.make_node(_nodeid, docid, subspace, num_levels);
+            auto tensor_ref = _vectors.get_tensor_entry_ref(docid);
+            _graph.nodes[_nodeid].tensor_ref().store_release(tensor_ref);
             for (uint32_t level = 0; level < num_levels; ++level) {
                 uint32_t num_links = next_int();
                 _link_array.clear();

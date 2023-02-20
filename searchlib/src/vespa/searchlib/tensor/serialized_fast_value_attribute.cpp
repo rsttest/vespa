@@ -10,6 +10,7 @@ LOG_SETUP(".searchlib.tensor.serialized_fast_value_attribute");
 
 using namespace vespalib;
 using namespace vespalib::eval;
+using vespalib::datastore::EntryRef;
 
 namespace search::tensor {
 
@@ -38,6 +39,25 @@ VectorBundle
 SerializedFastValueAttribute::get_vectors(uint32_t docid) const
 {
     EntryRef ref = acquire_entry_ref(docid);
+    return _tensorBufferStore.get_vectors(ref);
+}
+
+EntryRef
+SerializedFastValueAttribute::get_tensor_entry_ref(uint32_t docid) const
+{
+    return acquire_entry_ref(docid);
+}
+
+vespalib::eval::TypedCells
+SerializedFastValueAttribute::get_vector(EntryRef ref, uint32_t subspace) const
+{
+    auto vectors = _tensorBufferStore.get_vectors(ref);
+    return (subspace < vectors.subspaces()) ? vectors.cells(subspace) : _tensorBufferStore.get_empty_subspace();
+}
+
+VectorBundle
+SerializedFastValueAttribute::get_vectors(EntryRef ref) const
+{
     return _tensorBufferStore.get_vectors(ref);
 }
 

@@ -26,6 +26,9 @@ public:
     // Implements DocVectorAccess
     vespalib::eval::TypedCells get_vector(uint32_t docid, uint32_t subspace) const override;
     VectorBundle get_vectors(uint32_t docid) const override;
+    EntryRef get_tensor_entry_ref(uint32_t docid) const override;
+    vespalib::eval::TypedCells get_vector(EntryRef ref, uint32_t subspace) const override;
+    VectorBundle get_vectors(EntryRef ref) const override;
 };
 
 }

@@ -66,9 +66,15 @@ TensorBufferStore::move_on_compact(EntryRef ref)
 vespalib::MemoryUsage
 TensorBufferStore::update_stat(const CompactionStrategy& compaction_strategy)
 {
+#if 0
     auto array_store_address_space_usage = _store.getAddressSpaceUsage();
+#endif
     auto array_store_memory_usage = _store.getMemoryUsage();
+#if 0
     _compaction_spec = compaction_strategy.should_compact(array_store_memory_usage, array_store_address_space_usage);
+#else
+    (void) compaction_strategy;
+#endif
     return array_store_memory_usage;
 }
 

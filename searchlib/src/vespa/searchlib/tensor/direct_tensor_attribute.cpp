@@ -6,6 +6,7 @@
 #include <vespa/searchcommon/attribute/config.h>
 
 using vespalib::eval::FastValueBuilderFactory;
+using vespalib::datastore::EntryRef;
 
 namespace search::tensor {
 
@@ -85,6 +86,25 @@ VectorBundle
 DirectTensorAttribute::get_vectors(uint32_t docid) const
 {
     EntryRef ref = acquire_entry_ref(docid);
+    return _direct_store.get_vectors(ref);
+}
+
+EntryRef
+DirectTensorAttribute::get_tensor_entry_ref(uint32_t docid) const
+{
+    return acquire_entry_ref(docid);
+}
+
+vespalib::eval::TypedCells
+DirectTensorAttribute::get_vector(EntryRef ref, uint32_t subspace) const
+{
+    auto vectors = _direct_store.get_vectors(ref);
+    return (subspace < vectors.subspaces()) ? vectors.cells(subspace) : _direct_store.get_empty_subspace();
+}
+
+VectorBundle
+DirectTensorAttribute::get_vectors(EntryRef ref) const
+{
     return _direct_store.get_vectors(ref);
 }
 

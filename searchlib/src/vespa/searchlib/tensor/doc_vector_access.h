@@ -5,6 +5,8 @@
 #include <vespa/eval/eval/typed_cells.h>
 #include <cstdint>
 
+namespace vespalib::datastore { class EntryRef; }
+
 namespace search::tensor {
 
 class VectorBundle;
@@ -19,6 +21,9 @@ public:
     virtual ~DocVectorAccess() {}
     virtual vespalib::eval::TypedCells get_vector(uint32_t docid, uint32_t subspace) const = 0;
     virtual VectorBundle get_vectors(uint32_t docid) const = 0;
+    virtual vespalib::datastore::EntryRef get_tensor_entry_ref(uint32_t docid) const = 0;
+    virtual vespalib::eval::TypedCells get_vector(vespalib::datastore::EntryRef ref, uint32_t subspace) const = 0;
+    virtual VectorBundle get_vectors(vespalib::datastore::EntryRef ref) const = 0;
 };
 
 }

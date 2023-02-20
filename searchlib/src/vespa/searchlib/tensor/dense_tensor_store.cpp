@@ -137,7 +137,11 @@ vespalib::MemoryUsage
 DenseTensorStore::update_stat(const CompactionStrategy& compaction_strategy)
 {
     auto memory_usage = _store.getMemoryUsage();
+#if 0
     _compaction_spec = CompactionSpec(compaction_strategy.should_compact_memory(memory_usage), false);
+#else
+    (void) compaction_strategy;
+#endif
     return memory_usage;
 }
 

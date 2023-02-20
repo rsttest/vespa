@@ -395,7 +395,7 @@ TensorAttribute::prepare_set_tensor(DocId docid, const vespalib::eval::Value& te
     checkTensorType(tensor);
     if (_index) {
         VectorBundle vectors(tensor.cells().data, tensor.index().size(), _subspace_type);
-        if (tensor_cells_are_unchanged(docid, vectors)) {
+        if (tensor_cells_are_unchanged(docid, vectors) && false) {
             // Don't make changes to the nearest neighbor index when the inserted tensor cells are unchanged.
             // With this optimization we avoid doing unnecessary costly work, first removing the vector point, then inserting the same point.
             return {};

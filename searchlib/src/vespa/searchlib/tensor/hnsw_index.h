@@ -153,6 +153,9 @@ protected:
     TypedCells get_vector(uint32_t docid, uint32_t subspace) const {
         return _vectors.get_vector(docid, subspace);
     }
+    TypedCells get_vector(vespalib::datastore::EntryRef tensor_ref, uint32_t subspace) const {
+        return _vectors.get_vector(tensor_ref, subspace);
+    }
     VectorBundle get_vectors(uint32_t docid) const {
         return _vectors.get_vectors(docid);
     }
@@ -160,6 +163,7 @@ protected:
     double calc_distance(uint32_t lhs_nodeid, uint32_t rhs_nodeid) const;
     double calc_distance(const TypedCells& lhs, uint32_t rhs_nodeid) const;
     double calc_distance(const TypedCells& lhs, uint32_t rhs_docid, uint32_t rhs_subspace) const;
+    double calc_distance(const TypedCells& lhs, vespalib::datastore::EntryRef rhs_tensor_ref, uint32_t rhs_subspace) const;
     uint32_t estimate_visited_nodes(uint32_t level, uint32_t nodeid_limit, uint32_t neighbors_to_find, const GlobalFilter* filter) const;
 
     /**

@@ -15,18 +15,22 @@ class HnswNode {
     using EntryRef = vespalib::datastore::EntryRef;
 
     AtomicEntryRef _levels_ref;
+    AtomicEntryRef _tensor_ref;
     vespalib::datastore::AtomicValueWrapper<uint32_t> _docid;
     vespalib::datastore::AtomicValueWrapper<uint32_t> _subspace;
 
 public:
     HnswNode() noexcept
         : _levels_ref(),
+          _tensor_ref(),
           _docid(),
           _subspace()
     {
     }
     AtomicEntryRef& levels_ref() noexcept { return _levels_ref; }
     const AtomicEntryRef& levels_ref() const noexcept { return _levels_ref; }
+    AtomicEntryRef& tensor_ref() noexcept { return _tensor_ref; }
+    const AtomicEntryRef& tensor_ref() const noexcept { return _tensor_ref; }
     void store_docid(uint32_t docid) noexcept { _docid.store_release(docid); }
     void store_subspace(uint32_t subspace) noexcept { _subspace.store_release(subspace); }
     // Mapping from nodeid to docid and subspace.

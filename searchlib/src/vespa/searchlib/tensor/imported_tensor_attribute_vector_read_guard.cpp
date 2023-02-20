@@ -5,6 +5,8 @@
 #include <vespa/searchlib/attribute/attributevector.h>
 #include <vespa/eval/eval/value.h>
 
+using vespalib::datastore::EntryRef;
+
 namespace search::tensor {
 
 namespace {
@@ -71,6 +73,24 @@ search::tensor::VectorBundle
 ImportedTensorAttributeVectorReadGuard::get_vectors(uint32_t docid) const
 {
     return _target_tensor_attribute.get_vectors(getTargetLid(docid));
+}
+
+vespalib::datastore::EntryRef
+ImportedTensorAttributeVectorReadGuard::get_tensor_entry_ref(uint32_t docid) const
+{
+    return _target_tensor_attribute.get_tensor_entry_ref(getTargetLid(docid));
+}
+
+vespalib::eval::TypedCells
+ImportedTensorAttributeVectorReadGuard::get_vector(EntryRef ref, uint32_t subspace) const
+{
+    return _target_tensor_attribute.get_vector(ref, subspace);
+}
+
+search::tensor::VectorBundle
+ImportedTensorAttributeVectorReadGuard::get_vectors(EntryRef ref) const
+{
+    return _target_tensor_attribute.get_vectors(ref);
 }
 
 const vespalib::eval::ValueType &

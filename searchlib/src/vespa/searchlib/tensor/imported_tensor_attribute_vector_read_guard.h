@@ -42,6 +42,9 @@ public:
 
     vespalib::eval::TypedCells get_vector(uint32_t docid, uint32_t subspace) const override;
     VectorBundle get_vectors(uint32_t docid) const override;
+    vespalib::datastore::EntryRef get_tensor_entry_ref(uint32_t docid) const override;
+    vespalib::eval::TypedCells get_vector(vespalib::datastore::EntryRef ref, uint32_t subspace) const override;
+    VectorBundle get_vectors(vespalib::datastore::EntryRef ref) const override;
 
     const vespalib::eval::ValueType &getTensorType() const override;
     void get_state(const vespalib::slime::Inserter& inserter) const override;

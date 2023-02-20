@@ -1,11 +1,13 @@
 // Copyright Yahoo. Licensed under the terms of the Apache 2.0 license. See LICENSE in the project root.
 
+#include <vespa/searchlib/tensor/doc_vector_access.h>
 #include <vespa/searchlib/tensor/hnsw_graph.h>
 #include <vespa/searchlib/tensor/hnsw_identity_mapping.h>
 #include <vespa/searchlib/tensor/hnsw_index_saver.h>
 #include <vespa/searchlib/tensor/hnsw_index_loader.hpp>
 #include <vespa/searchlib/tensor/hnsw_index_traits.h>
 #include <vespa/searchlib/tensor/hnsw_nodeid_mapping.h>
+#include <vespa/searchlib/tensor/vector_bundle.h>
 #include <vespa/searchlib/test/vector_buffer_reader.h>
 #include <vespa/searchlib/test/vector_buffer_writer.h>
 #include <vespa/searchlib/util/fileutil.h>
@@ -22,6 +24,18 @@ using search::test::VectorBufferReader;
 using search::test::VectorBufferWriter;
 
 using V = std::vector<uint32_t>;
+
+class MyDocVectorAccess : public search::tensor::DocVectorAccess
+{
+public:
+    ~MyDocVectorAccess() override = default;
+    vespalib::eval::TypedCells get_vector(uint32_t, uint32_t) const override { return vespalib::eval::TypedCells(); }
+    VectorBundle get_vectors(uint32_t) const override { return VectorBundle(); }
+    vespalib::datastore::EntryRef get_tensor_entry_ref(uint32_t) const override { return vespalib::datastore::EntryRef(); }
+    vespalib::eval::TypedCells get_vector(vespalib::datastore::EntryRef, uint32_t) const override { return vespalib::eval::TypedCells(); }
+    VectorBundle get_vectors(vespalib::datastore::EntryRef) const override { return VectorBundle(); }
+
+};
 
 template <HnswIndexType type>
 uint32_t fake_docid(uint32_t nodeid);
@@ -155,7 +169,8 @@ public:
     }
     void load_copy(std::vector<char> data) {
         typename HnswIndexTraits<GraphType::index_type>::IdMapping id_mapping;
-        HnswIndexLoader<VectorBufferReader, GraphType::index_type> loader(copy, id_mapping, std::make_unique<VectorBufferReader>(data));
+        MyDocVectorAccess vectors;
+        HnswIndexLoader<VectorBufferReader, GraphType::index_type> loader(copy, id_mapping, vectors, std::make_unique<VectorBufferReader>(data));
         while (loader.load_next()) {}
     }
 

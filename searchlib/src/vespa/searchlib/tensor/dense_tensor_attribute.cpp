@@ -3,6 +3,8 @@
 #include "dense_tensor_attribute.h"
 #include <vespa/searchcommon/attribute/config.h>
 
+using vespalib::datastore::EntryRef;
+
 namespace search::tensor {
 
 DenseTensorAttribute::DenseTensorAttribute(vespalib::stringref baseFileName, const Config& cfg,
@@ -40,6 +42,24 @@ VectorBundle
 DenseTensorAttribute::get_vectors(uint32_t docid) const
 {
     EntryRef ref = acquire_entry_ref(docid);
+    return _denseTensorStore.get_vectors(ref);
+}
+
+EntryRef
+DenseTensorAttribute::get_tensor_entry_ref(uint32_t docid) const
+{
+    return acquire_entry_ref(docid);
+}
+
+vespalib::eval::TypedCells
+DenseTensorAttribute::get_vector(EntryRef ref, uint32_t subspace) const
+{
+    return _denseTensorStore.get_typed_cells((subspace == 0) ? ref : EntryRef());
+}
+
+VectorBundle
+DenseTensorAttribute::get_vectors(EntryRef ref) const
+{
     return _denseTensorStore.get_vectors(ref);
 }
 

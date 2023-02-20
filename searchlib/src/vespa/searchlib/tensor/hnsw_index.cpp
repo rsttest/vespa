@@ -298,6 +298,14 @@ HnswIndex<type>::calc_distance(const TypedCells& lhs, uint32_t rhs_docid, uint32
 }
 
 template <HnswIndexType type>
+double
+HnswIndex<type>::calc_distance(const TypedCells& lhs, EntryRef rhs_tensor_ref, uint32_t rhs_subspace) const
+{
+    auto rhs = get_vector(rhs_tensor_ref, rhs_subspace);
+    return _distance_func->calc(lhs, rhs);
+}
+
+template <HnswIndexType type>
 uint32_t
 HnswIndex<type>::estimate_visited_nodes(uint32_t level, uint32_t nodeid_limit, uint32_t neighbors_to_find, const GlobalFilter* filter) const
 {
@@ -333,8 +341,9 @@ HnswIndex<type>::find_nearest_in_layer(const TypedCells& input, const HnswCandid
             auto& neighbor_node = _graph.acquire_node(neighbor_nodeid);
             auto neighbor_ref = neighbor_node.levels_ref().load_acquire();
             uint32_t neighbor_docid = acquire_docid(neighbor_node, neighbor_nodeid);
+            auto neighbor_tensor_ref = neighbor_node.tensor_ref().load_acquire();
             uint32_t neighbor_subspace = neighbor_node.acquire_subspace();
-            double dist = calc_distance(input, neighbor_docid, neighbor_subspace);
+            double dist = calc_distance(input, neighbor_tensor_ref, neighbor_subspace);
             if (_graph.still_valid(neighbor_nodeid, neighbor_ref)
                 && dist < nearest.distance)
             {
@@ -388,8 +397,9 @@ HnswIndex<type>::search_layer_helper(const TypedCells& input, uint32_t neighbors
                 continue;
             }
             uint32_t neighbor_docid = acquire_docid(neighbor_node, neighbor_nodeid);
+            auto neighbor_tensor_ref = neighbor_node.tensor_ref().load_acquire();
             uint32_t neighbor_subspace = neighbor_node.acquire_subspace();
-            double dist_to_input = calc_distance(input, neighbor_docid, neighbor_subspace);
+            double dist_to_input = calc_distance(input, neighbor_tensor_ref, neighbor_subspace);
             if (dist_to_input < limit_dist) {
                 candidates.emplace(neighbor_nodeid, neighbor_ref, dist_to_input);
                 if (filter_wrapper.check(neighbor_docid)) {
@@ -554,6 +564,8 @@ HnswIndex<type>::internal_complete_add_node(uint32_t nodeid, uint32_t docid, uin
 {
     int32_t num_levels = prepared_node.connections.size();
     auto levels_ref = _graph.make_node(nodeid, docid, subspace, num_levels);
+    auto tensor_ref = _vectors.get_tensor_entry_ref(docid);
+    _graph.nodes[nodeid].tensor_ref().store_release(tensor_ref);
     for (int level = 0; level < num_levels; ++level) {
         auto neighbors = filter_valid_nodeids(level, prepared_node.connections[level], nodeid);
         connect_new_node(nodeid, neighbors, level);
@@ -837,7 +849,7 @@ HnswIndex<type>::make_loader(FastOS_FileInterface& file)
     assert(get_entry_nodeid() == 0); // cannot load after index has data
     using ReaderType = FileReader<uint32_t>;
     using LoaderType = HnswIndexLoader<ReaderType, type>;
-    return std::make_unique<LoaderType>(_graph, _id_mapping, std::make_unique<ReaderType>(&file));
+    return std::make_unique<LoaderType>(_graph, _id_mapping, _vectors, std::make_unique<ReaderType>(&file));
 }
 
 struct NeighborsByDocId {

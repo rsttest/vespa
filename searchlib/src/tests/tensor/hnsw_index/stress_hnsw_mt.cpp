@@ -32,6 +32,7 @@ LOG_SETUP("stress_hnsw_mt");
 using namespace search::tensor;
 using namespace vespalib::slime;
 using search::BitVector;
+using vespalib::datastore::EntryRef;
 using vespalib::eval::CellType;
 using vespalib::eval::ValueType;
 using vespalib::GenerationHandler;
@@ -130,6 +131,13 @@ public:
         ConstVectorRef ref(_vectors[docid]);
         assert(subspace_type.size() == ref.size());
         return VectorBundle(ref.data(), 1, subspace_type);
+    }
+    EntryRef get_tensor_entry_ref(uint32_t docid) const override { return EntryRef(docid + 1); }
+    vespalib::eval::TypedCells get_vector(EntryRef ref, uint32_t subspace) const override {
+        return get_vector(ref.ref() - 1, subspace);
+    }
+    VectorBundle get_vectors(EntryRef ref) const override {
+        return get_vectors(ref.ref() - 1);
     }
 };
 

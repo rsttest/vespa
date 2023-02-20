@@ -5,6 +5,8 @@
 #include <vespa/vespalib/util/rcuvector.hpp>
 #include <vespa/vespalib/datastore/array_store.hpp>
 
+using vespalib::datastore::EntryRef;
+
 namespace search::tensor {
 
 template <HnswIndexType type>
@@ -52,6 +54,7 @@ HnswGraph<type>::remove_node(uint32_t nodeid)
     auto levels = levels_store.get(levels_ref);
     vespalib::datastore::EntryRef invalid;
     nodes[nodeid].levels_ref().store_release(invalid);
+    nodes[nodeid].tensor_ref().store_release(invalid);
     // Ensure data referenced through the old ref can be recycled:
     levels_store.remove(levels_ref);
     for (size_t i = 0; i < levels.size(); ++i) {

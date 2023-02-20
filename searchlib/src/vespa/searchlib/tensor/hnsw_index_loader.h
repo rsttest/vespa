@@ -13,6 +13,7 @@ class FastOS_FileInterface;
 
 namespace search::tensor {
 
+class DocVectorAccess;
 template <HnswIndexType type>
 struct HnswGraph;
 
@@ -33,6 +34,7 @@ private:
     std::vector<uint32_t> _link_array;
     bool _complete;
     IdMapping& _id_mapping;
+    const DocVectorAccess& _vectors;
 
     void init();
     uint32_t next_int() {
@@ -40,7 +42,7 @@ private:
     }
 
 public:
-    HnswIndexLoader(HnswGraph<type>& graph, IdMapping& id_mapping, std::unique_ptr<ReaderType> reader);
+    HnswIndexLoader(HnswGraph<type>& graph, IdMapping& id_mapping, const DocVectorAccess& vectors, std::unique_ptr<ReaderType> reader);
     virtual ~HnswIndexLoader();
     bool load_next() override;
 };

@@ -36,6 +36,7 @@ using vespalib::eval::get_cell_type;
 using vespalib::eval::ValueType;
 using vespalib::datastore::CompactionSpec;
 using vespalib::datastore::CompactionStrategy;
+using vespalib::datastore::EntryRef;
 using search::queryeval::GlobalFilter;
 using search::test::VectorBufferReader;
 using search::test::VectorBufferWriter;
@@ -69,6 +70,13 @@ public:
         assert((ref.size() % _subspace_type.size()) == 0);
         uint32_t subspaces = ref.size() / _subspace_type.size();
         return VectorBundle(ref.data(), subspaces, _subspace_type);
+    }
+    EntryRef get_tensor_entry_ref(uint32_t docid) const override { return EntryRef(docid + 1); }
+    vespalib::eval::TypedCells get_vector(EntryRef ref, uint32_t subspace) const override {
+        return get_vector(ref.ref() - 1, subspace);
+    }
+    VectorBundle get_vectors(EntryRef ref) const override {
+        return get_vectors(ref.ref() - 1);
     }
 
     void clear() { _vectors.clear(); }
@@ -250,7 +258,7 @@ public:
     void load_index(std::vector<char> data) {
         auto& graph = index->get_graph();
         auto& id_mapping = index->get_id_mapping();
-        HnswIndexLoader<VectorBufferReader, IndexType::index_type> loader(graph, id_mapping, std::make_unique<VectorBufferReader>(data));
+        HnswIndexLoader<VectorBufferReader, IndexType::index_type> loader(graph, id_mapping, vectors, std::make_unique<VectorBufferReader>(data));
         while (loader.load_next()) {}
     }
 
