@@ -417,14 +417,19 @@ TEST("require that handle/string can be obtained from string_id") {
     EXPECT_EQUAL(Handle::string_from_id(b.id()), vespalib::string("str"));
 }
 
-void verifySelfAssignment(Handle & a, const Handle &b) {
+void verifySelfAssignment(Handle &a, const Handle &b) {
     a = b;
+}
+
+void verifySelfMoveAssignment(Handle &a, Handle &&b) {
+    a = std::move(b);
 }
 
 TEST("require that handle can be self-assigned") {
     Handle a("foo");
     verifySelfAssignment(a, a);
     EXPECT_EQUAL(a.as_string(), vespalib::string("foo"));
+    verifySelfMoveAssignment(a, std::move(a)); // should not crash
 }
 
 //-----------------------------------------------------------------------------
