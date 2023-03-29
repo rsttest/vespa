@@ -14,6 +14,7 @@ import com.yahoo.search.query.properties.SubProperties;
 /**
  * @author <a href="mailto:arnebef@yahoo-inc.com">Arne Bergene Fossaa</a>
  */
+@Deprecated(forRemoval = true)
 public class SubPropertiesTestCase {
 
     @Test
