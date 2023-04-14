@@ -11,9 +11,10 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author mpolden
@@ -57,7 +58,7 @@ public class ContainerOperationsTest {
     }
 
     private Container createContainer(String name, boolean managed) {
-        return new Container(new ContainerId("id-of-" + name), new ContainerName(name), Instant.EPOCH, PartialContainer.State.running,
+        return new Container(new ContainerId(Integer.toHexString(name.hashCode())), new ContainerName(name), Instant.EPOCH, PartialContainer.State.running,
                              "image-id", DockerImage.EMPTY, Map.of(), 42, 43, name,
                              ContainerResources.UNLIMITED, List.of(), managed);
     }
