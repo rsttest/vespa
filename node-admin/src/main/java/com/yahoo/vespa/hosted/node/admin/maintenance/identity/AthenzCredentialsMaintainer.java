@@ -321,7 +321,7 @@ public class AthenzCredentialsMaintainer implements CredentialsMaintainer {
         NODE("vespa-node-identity-document.json"),
         TENANT("vespa-tenant-identity-document.json");
 
-        private String identityDocument;
+        private final String identityDocument;
         IdentityType(String identityDocument) {
             this.identityDocument = identityDocument;
         }
